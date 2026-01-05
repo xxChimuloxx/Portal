@@ -357,7 +357,7 @@ function renderLinks(){
 }
   
   
-/*  function loginAttempt(){
+  function loginAttempt(){
     err.style.display = "none";
     const v = (key.value || "").trim();
 
@@ -369,9 +369,9 @@ function renderLinks(){
     localStorage.setItem(STORAGE_KEY, "1");
     showApp();
   }
-*/
 
-  async function loginAttempt(){
+
+  /*async function loginAttempt(){
     err.style.display = "none";
     const v = (key.value || "").trim();
     if (!v) return;
@@ -394,7 +394,7 @@ function renderLinks(){
     }catch(e){
       err.style.display = "block";
     }
-  }
+  }*/
   
   btn.addEventListener("click", loginAttempt);
   key.addEventListener("keydown", (e) => { if (e.key === "Enter") loginAttempt(); });
