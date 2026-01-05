@@ -221,6 +221,7 @@
    ***********************************************************/
   const PORTAL_KEY = "SNA01cc0001"; // <-- Cambiala
   const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwKJf6HOdMMnuAcbxVM6mQPK07NRoiCEIFmiY-4BcWLnAfoRksLy_9kHvpNDxkon74r/exec";
+  const WEBAPP2_URL = "https://script.google.com/macros/s/AKfycbyI6ne3sC-SMo6rDriE7Ovad61gk_byJR0ncvxMYZyDu4GMWoan8Qpj_5W9hz0q3HVVpA/exec";
 
   // Links del portal (editables)
   const LINKS = [
@@ -290,6 +291,10 @@ function renderLinks(){
     ? `${WEBAPP_URL}?action=view&token=${encodeURIComponent(token)}`
     : WEBAPP_URL;
 
+  const anivUrl = token
+    ? `${WEBAPP2_URL}?action=view&token=${encodeURIComponent(token)}`
+    : WEBAPP2_URL;
+  
   const linksRuntime = [
     {
       title: "Cumpleaños (hoy)",
@@ -303,6 +308,24 @@ function renderLinks(){
       href: "#",
       badge: "FECHA",
       onclick: true
+    },
+    {
+      title: "Aniversario BNA (hoy)",
+      desc: "Listado dinámico de aniversarios por área.",
+      href: anivUrl,
+      badge: "CUMPLES"
+    },
+    {
+      title: "Drive (Carpeta IN)",
+      desc: "Input del TXT.",
+      href: "https://drive.google.com/drive/folders/1V4x3PzOdHxeFiYGapTu3h4ddaSHD5Z8a",
+      badge: "DRIVE"
+    },
+    {
+      title: "Drive (Carpeta OUT)",
+      desc: "Output (Salida guarda HTML/CSV).",
+      href: "https://drive.google.com/drive/folders/1-0W9_wZvZ3E50UWaBZ6SR6-MS3j6geOF",
+      badge: "DRIVE"
     }
   ];
 
