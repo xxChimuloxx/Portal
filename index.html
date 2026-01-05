@@ -220,6 +220,7 @@
    * CONFIG PORTAL (EDITÁ ESTO)
    ***********************************************************/
   const PORTAL_KEY = "SNA01cc0001"; // <-- Cambiala
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwKJf6HOdMMnuAcbxVM6mQPK07NRoiCEIFmiY-4BcWLnAfoRksLy_9kHvpNDxkon74r/exec";
 
   // Links del portal (editables)
   const LINKS = [
@@ -272,7 +273,7 @@
     key.focus();
   }
 
-  function renderLinks(){
+/*  function renderLinks(){
     grid.innerHTML = LINKS.map(x => `
       <a class="tile" href="${x.href}" target="_blank" rel="noopener">
         <div class="badge">${x.badge || "LINK"}</div>
@@ -281,8 +282,56 @@
       </a>
     `).join("");
   }
+*/
 
-  function loginAttempt(){
+function renderLinks(){
+  const token = localStorage.getItem("portal_token") || "";
+  const cumplesUrl = token
+    ? `${WEBAPP_URL}?action=view&token=${encodeURIComponent(token)}`
+    : WEBAPP_URL;
+
+  const linksRuntime = [
+    {
+      title: "Cumpleaños (hoy)",
+      desc: "Listado dinámico de cumpleañeros por área.",
+      href: cumplesUrl,
+      badge: "CUMPLES"
+    },
+    {
+      title: "Cumpleaños (otra fecha)",
+      desc: "Te pide YYYYMMDD y abre el listado.",
+      href: "#",
+      badge: "FECHA",
+      onclick: true
+    }
+  ];
+
+  grid.innerHTML = linksRuntime.map((x, i) => `
+    <a class="tile" href="${x.href}" data-idx="${i}" target="_blank" rel="noopener">
+      <div class="badge">${x.badge || "LINK"}</div>
+      <div class="tile-title">${x.title}</div>
+      <div class="tile-desc">${x.desc || ""}</div>
+    </a>
+  `).join("");
+
+  // hook para "otra fecha"
+  [...grid.querySelectorAll('a[data-idx]')].forEach(a=>{
+    const idx = Number(a.getAttribute("data-idx"));
+    if(idx === 1){
+      a.addEventListener("click", (ev)=>{
+        ev.preventDefault();
+        const t = localStorage.getItem("portal_token") || "";
+        if(!t){ alert("No hay token. Logueate de nuevo."); return; }
+        const f = prompt("Fecha YYYYMMDD (ej 20260228):");
+        if(!f) return;
+        window.open(`${WEBAPP_URL}?action=view&token=${encodeURIComponent(t)}&fecha=${encodeURIComponent(f)}`, "_blank");
+      });
+    }
+  });
+}
+  
+  
+/*  function loginAttempt(){
     err.style.display = "none";
     const v = (key.value || "").trim();
 
@@ -294,12 +343,43 @@
     localStorage.setItem(STORAGE_KEY, "1");
     showApp();
   }
+*/
 
+  async function loginAttempt(){
+    err.style.display = "none";
+    const v = (key.value || "").trim();
+    if (!v) return;
+  
+    try{
+      const url = `${WEBAPP_URL}?action=auth&key=${encodeURIComponent(v)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+  
+      if(!data || !data.ok || !data.token){
+        err.style.display = "block";
+        return;
+      }
+  
+      // guardo token y exp
+      localStorage.setItem("portal_token", data.token);
+      localStorage.setItem("portal_token_exp", String(data.exp || ""));
+  
+      showApp();
+    }catch(e){
+      err.style.display = "block";
+    }
+  }
+  
   btn.addEventListener("click", loginAttempt);
   key.addEventListener("keydown", (e) => { if (e.key === "Enter") loginAttempt(); });
 
   logout.addEventListener("click", () => {
     localStorage.removeItem(STORAGE_KEY);
+
+    // limpia seguridad real (token)
+    localStorage.removeItem("portal_token");
+    localStorage.removeItem("portal_token_exp");
+    
     showLogin();
   });
 
